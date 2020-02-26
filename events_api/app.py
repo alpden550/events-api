@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 
-from events_api.blueprints.main import main_bp
+from events_api.blueprints.api import api_bp
 
 
 def create_app(config_name=None):
@@ -11,6 +11,6 @@ def create_app(config_name=None):
 
     app = Flask(__name__)
 
-    app.register_blueprint(main_bp)
+    app.register_blueprint(api_bp, url_prefix='/api')
 
     return app
