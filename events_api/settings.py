@@ -11,11 +11,11 @@ class BaseConfig(object):
 
 
 class ProductionConfig(BaseConfig):
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///{db}'.format(db=BASE_DIR.joinpath('events.sqlite.db'))
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///{db}'.format(db=BASE_DIR.joinpath('events.sqlite'))
 
 
 class DevelopmentConfig(BaseConfig):
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///{db}'.format(db=BASE_DIR.joinpath('dev.sqlite.db'))
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///{db}'.format(db=BASE_DIR.joinpath('dev.sqlite'))
 
 
 class TestingConfig(BaseConfig):
