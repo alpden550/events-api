@@ -4,9 +4,9 @@ import click
 from flask import Flask
 
 from events_api.blueprints.api import api_bp
-from events_api.extensions import db
-from events_api.settings import config
+from events_api.extensions import admin, db
 from events_api.models import User
+from events_api.settings import config
 
 
 def create_app(config_name=None):
@@ -19,12 +19,18 @@ def create_app(config_name=None):
     app.register_blueprint(api_bp, url_prefix='/api')
     register_extensions(app)
     register_commands(app)
+    register_admin()
 
     return app
 
 
 def register_extensions(app):
     db.init_app(app)
+    admin.init_app(app)
+
+
+def register_admin():
+    pass
 
 
 def register_commands(app):
@@ -33,7 +39,6 @@ def register_commands(app):
         """Create empty database."""
         db.drop_all()
         db.create_all()
-        # Event.query.all()
         click.echo('Initialized empty database.')
 
     @app.cli.command()
