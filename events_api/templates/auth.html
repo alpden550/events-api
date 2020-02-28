@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <title>Authorisation | EVENTS CRM</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+    <main class="container">
+        <div class="row">
+            <div class="col-8 col-lg-4 offset-2 offset-lg-4">
+                <form method="POST" action="/admin/login" class="form-signin pt-5 mt-5">
+                    {{ form.csrf_token }}
+                    <div class="text-center m-6 b-1">
+                        <h1 class="h3 mb-3 font-weight-normal">Stepic CRM</h1>
+                        <p class="mb-4">Что-то мы вас не узнали</p>
+                    </div>
+
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <p class="alert alert-danger text-center">{{ message }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="form-label-group">
+                        <p class="text-muted">Электропочта</p>
+                        {{ form.email(class="form-control", required=required, autofocus=autofocus) }}
+                    </div>
+                    <div class="form-label-group mt-3">
+                        <p class="text-muted">Пароль</p>
+                        {{ form.password(class="form-control", required=required) }}
+                    </div>
+                    <div class="checkbox my-4">
+                        {{ form.is_remembered }}
+                        {{ form.is_remembered.label(class="form-check-label") }}
+                    </div>
+
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

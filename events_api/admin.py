@@ -1,5 +1,8 @@
+from flask import flash, redirect, request, url_for
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
+
+from events_api.form import LoginForm
 
 
 class AdminView(AdminIndexView):
@@ -7,6 +10,19 @@ class AdminView(AdminIndexView):
     @expose('/')
     def admin_index(self):
         return self.render('admin.html')
+
+    @expose('/login', methods=['GET', 'POST'])
+    def login(self):
+        form = LoginForm()
+        if request.method == 'POST':
+            from events_api.models import User
+            user = User.query.filter_by(email=form.email.data).first()
+            if user is None or not user.validate_password(form.password.data):
+                flash('Неверное имя пользователя или пароль')
+                return self.render('auth.html', form=form)
+            return redirect(url_for('admin.admin_index'))
+
+        return self.render('auth.html', form=form)
 
 
 class UserView(ModelView):
@@ -73,4 +89,4 @@ class LocationView(ModelView):
         'location_type': 'Код города',
         'events': 'События',
     }
-    column_editable_list = ('title', 'location_type',)
+    column_editable_list = ('title', 'location_type')
