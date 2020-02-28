@@ -5,7 +5,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from events_api.extensions import db
 
 
-class BaseMixin(object):
+class BaseMixin:
     """
     A mixin that adds a surrogate integer 'primary key' column named `id`
     to any declarative-mapped class and other usefull stuff.
@@ -82,7 +82,7 @@ class Event(BaseMixin, db.Model):
     event_type = db.Column(ChoiceType(EVENT_TYPES), default='HACKATON')
     category = db.Column(ChoiceType(CATEGORY_TYPES), default='PYTHON')
     address = db.Column(db.String(150))
-    seats = db.Column(db.Integer)
+    seats = db.Column(db.Integer, default=10)
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'))
 
     participants = db.relationship(
@@ -125,10 +125,7 @@ class Enrollment(BaseMixin, db.Model):
 
 class Location(BaseMixin, db.Model):
     title = db.Column(db.String(20))
-    location_type = db.Column(
-        db.Enum('nsk', 'msk', 'kzn', 'online', name='types'),
-        default='online',
-    )
+    location_type = db.Column(db.String(10), default='online')
     events = db.relationship('Event', back_populates='location')
 
     def __repr__(self):

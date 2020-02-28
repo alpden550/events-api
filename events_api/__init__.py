@@ -3,9 +3,10 @@ import os
 import click
 from flask import Flask
 
+from events_api.admin import EventView, ParticipantView, UserView, EnrollmentView, LocationView
 from events_api.blueprints.api import api_bp
 from events_api.extensions import admin, db
-from events_api.models import User
+from events_api.models import Event, Participant, User, Enrollment, Location
 from events_api.settings import config
 
 
@@ -16,7 +17,7 @@ def create_app(config_name=None):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
-    app.register_blueprint(api_bp, url_prefix='/api')
+    app.register_blueprint(api_bp, url_prefix='/api/')
     register_extensions(app)
     register_commands(app)
     register_admin()
@@ -30,7 +31,11 @@ def register_extensions(app):
 
 
 def register_admin():
-    pass
+    admin.add_view(UserView(User, db.session, name='Пользователи'))
+    admin.add_view(EventView(Event, db.session, name='События'))
+    admin.add_view(ParticipantView(Participant, db.session, name='Участники'))
+    admin.add_view(LocationView(Location, db.session, name='Города'))
+    admin.add_view(EnrollmentView(Enrollment, db.session, name='Регистрации'))
 
 
 def register_commands(app):
@@ -47,7 +52,5 @@ def register_commands(app):
     @click.option('-p', '--password', default='1111', help='Password for admin')
     def superuser(name, email, password):
         """Create default admin."""
-        admin = User(username=name, email=email, password=password)
-        db.session.add(admin)
-        db.session.commit()
+        User.create(username=name, email=email, password=password)
         click.echo('Default admin was created.')
