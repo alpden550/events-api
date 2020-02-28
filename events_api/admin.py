@@ -1,18 +1,32 @@
 from flask import flash, redirect, request, url_for
 from flask_admin import AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
+from flask_login import current_user, login_required, login_user, logout_user
 
 from events_api.form import LoginForm
 
 
+class Forbidden(object):
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        flash('Нужен аккаунт администратора!')
+        return redirect(url_for('admin.login'))
+
+
 class AdminView(AdminIndexView):
 
+    @login_required
     @expose('/')
     def admin_index(self):
         return self.render('admin.html')
 
     @expose('/login', methods=['GET', 'POST'])
     def login(self):
+        if current_user.is_authenticated:
+            return redirect(url_for('admin.admin_index'))
+
         form = LoginForm()
         if request.method == 'POST':
             from events_api.models import User
@@ -20,12 +34,19 @@ class AdminView(AdminIndexView):
             if user is None or not user.validate_password(form.password.data):
                 flash('Неверное имя пользователя или пароль')
                 return self.render('auth.html', form=form)
+
+            login_user(user, remember=form.is_remembered.data)
             return redirect(url_for('admin.admin_index'))
 
         return self.render('auth.html', form=form)
 
+    @expose('/logout')
+    def logout(self):
+        logout_user()
+        return redirect(url_for('admin.admin_index'))
 
-class UserView(ModelView):
+
+class UserView(Forbidden, ModelView):
     column_exclude_list = ('password',)
     column_labels = {
         'username': 'Username',
@@ -36,7 +57,7 @@ class UserView(ModelView):
     edit_modal = True
 
 
-class EventView(ModelView):
+class EventView(Forbidden, ModelView):
     column_labels = {
         'title': 'Название',
         'description': 'Описание',
@@ -61,7 +82,7 @@ class EventView(ModelView):
     )
 
 
-class ParticipantView(ModelView):
+class ParticipantView(Forbidden, ModelView):
     column_exclude_list = ('password',)
     column_labels = {
         'name': 'Имя участника',
@@ -75,7 +96,7 @@ class ParticipantView(ModelView):
     }
 
 
-class EnrollmentView(ModelView):
+class EnrollmentView(Forbidden, ModelView):
     column_labels = {
         'registrated_at': 'Дата регистрации',
         'participant': 'Участник',
@@ -83,7 +104,7 @@ class EnrollmentView(ModelView):
     }
 
 
-class LocationView(ModelView):
+class LocationView(Forbidden, ModelView):
     column_labels = {
         'title': 'Город',
         'location_type': 'Код города',

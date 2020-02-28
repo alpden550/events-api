@@ -9,3 +9,7 @@ db = SQLAlchemy()
 login = LoginManager()
 admin = Admin(index_view=AdminView(), name='EVENTS CRM')
 csrf = CSRFProtect()
+login = LoginManager()
+
+login.login_view = 'admin.login'
+login.login_message = 'Авторизуйтесь для доступа к CRM'

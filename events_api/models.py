@@ -1,8 +1,9 @@
+from flask_login import UserMixin
 from sqlalchemy import event
 from sqlalchemy_utils import ChoiceType, EmailType
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from events_api.extensions import db
+from events_api.extensions import db, login
 
 
 class BaseMixin:
@@ -54,7 +55,7 @@ events_participants = db.Table(
 )
 
 
-class User(BaseMixin, db.Model):
+class User(UserMixin, BaseMixin, db.Model):
     username = db.Column(db.String(20), nullable=False, unique=True)
     email = db.Column(EmailType, unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
@@ -140,3 +141,8 @@ def hash_partisipant_password(target, password, *args):
 @event.listens_for(User.password, 'set', retval=True)
 def hash_user_password(target, password, *args):
     return generate_password_hash(password)
+
+
+@login.user_loader
+def load_user(uid):
+    return User.query.get(int(uid))
