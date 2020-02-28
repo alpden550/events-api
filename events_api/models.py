@@ -98,8 +98,8 @@ class Event(BaseMixin, db.Model):
 
 class Participant(BaseMixin, db.Model):
     name = db.Column(db.String(100), nullable=False)
-    email = db.Column(EmailType)
-    password = db.Column(db.String(200))
+    email = db.Column(EmailType, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
     picture = db.Column(db.String(100))
     location = db.Column(db.String(30))
     about = db.Column(db.String(300))

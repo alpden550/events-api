@@ -8,6 +8,7 @@ class BaseConfig(object):
     DEBUG = os.getenv('DEBUG') in {'1', 'yes', 'true', 'True'}
     SECRET_KEY = os.getenv('SECRET_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JSON_AS_ASCII = False
 
 
 class ProductionConfig(BaseConfig):

@@ -1,5 +1,8 @@
 from flask import Blueprint, jsonify
 
+from events_api.models import Location
+from events_api.schema_models import LocationSchema
+
 api_bp = Blueprint('api', __name__)
 
 
@@ -10,7 +13,10 @@ def index():
 
 @api_bp.route('/locations/', methods=['GET'])
 def get_locations():
-    return jsonify([])
+    schema = LocationSchema(many=True)
+    locations = Location.query.all()
+    locations_json = schema.dump(locations)
+    return jsonify(locations_json), 200
 
 
 @api_bp.route('/events/', methods=['GET'])
