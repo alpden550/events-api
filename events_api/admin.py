@@ -12,7 +12,7 @@ class Forbidden(object):
 
     def inaccessible_callback(self, name, **kwargs):
         flash('Нужен аккаунт администратора!')
-        return redirect(url_for('admin.login'))
+        return redirect(url_for('admin.login', next=request.url))
 
 
 class AdminView(AdminIndexView):
