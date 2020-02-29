@@ -61,9 +61,13 @@ def get_enrollment(eventid):
     )
 
 
-@api_bp.route('/enrollments/<int:eventid>', methods=['DELETE'])
-def delete_enrollment(eventid):
-    return jsonify({'delete': 'success'})
+@api_bp.route('/enrollments/<int:enrollment_id>', methods=['DELETE'])
+def delete_enrollment(enrollment_id):
+    enrollment = Enrollment.query.get(enrollment_id)
+    if enrollment is None:
+        return jsonify({'status': 'error, enrollment does not exist'}), 400
+    enrollment.delete()
+    return jsonify({'delete': 'success'}), 201
 
 
 @api_bp.route('/register/', methods=['POST'])
