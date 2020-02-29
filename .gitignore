@@ -126,3 +126,5 @@ dmypy.json
 
 .vscode/
 *.sqlite
+coverage_html_report/
+.DS_Store
