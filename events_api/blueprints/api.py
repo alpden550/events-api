@@ -112,4 +112,9 @@ def authorize():
 
 @api_bp.route('/profile/<int:profileid>', methods=['GET'])
 def profile(profileid):
-    return jsonify({'id': 1, 'picture': '', 'city': 'nsk', 'about': '', 'enrollments': []})
+    participant = Participant.query.get(profileid)
+    if participant is None:
+        return jsonify({'status': 'error, participant does not exist'}), 400
+
+    schema = ParticipantSchema()
+    return jsonify(schema.dump(participant))
