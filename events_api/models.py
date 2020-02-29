@@ -86,8 +86,6 @@ class Event(BaseMixin, db.Model):
     seats = db.Column(db.Integer, default=10)
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'))
 
-    test_type = db.Column(db.Enum('HACKATON', 'GAME', 'WORKSHOP', name='test_type'), default='GAME')
-
     participants = db.relationship(
         'Participant', secondary='events_participants', back_populates='events', lazy='joined',
     )
