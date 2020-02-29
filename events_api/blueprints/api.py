@@ -42,7 +42,7 @@ def register_enrollment(eventid):
     event = Event.query.get(eventid)
     if event is None:
         return jsonify({'status': 'error, event does not found'}), 400
-    if len(event.enrollments) > event.seats:
+    if event.seats <= len(event.enrollments):
         return jsonify({'status': 'error, not seats'}), 500
 
     participant = Participant.query.filter_by(email=request.json.get('email')).first()

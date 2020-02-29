@@ -1,8 +1,10 @@
+import json
+
 import pytest
 from flask import request
 
 from events_api.extensions import db
-from events_api.models import Event, Location
+from events_api.models import Event, Location, Participant, Enrollment
 from tests.conftest import app
 
 
@@ -21,13 +23,14 @@ class TestApi:
             Location.create(title='Спб')
             locations = Location.query.all()
             Event.create(title='Flask', location=locations[0])
-            Event.create(title='Django', location=locations[1], event_type='GAME')
+            Event.create(title='Django', location=locations[1], event_type='GAME', seats=1)
+            Participant.create(name='Name', email='test@gmail.com', password='qwerty')
+            Participant.create(name='Another Name', email='another@gmail.com', password='qwerty')
 
     @classmethod
     def teardown_class(cls):
         with app.app_context():
-            db.session.query(Location).delete()
-            db.session.query(Event).delete()
+            db.drop_all(app=app)
             db.session.commit()
 
     def test_api_page(self, client):
@@ -55,3 +58,61 @@ class TestApi:
         response = client.get('/api/events/?eventtype=hackaton')
         assert response.content_type == 'application/json'
         assert len(response.json) == 1
+
+    def test_register_enrollment_wrong_email(self, client):
+        json_data = json.dumps({'email': 'test@test.com'})
+        response = client.post(
+            '/api/enrollments/1',
+            data=json_data,
+            content_type='application/json',
+        )
+        assert response.status_code == 400
+        assert 'error' in response.json.get('status')
+
+    def test_register_enrollment_correct_email(self, client):
+        json_data = json.dumps({'email': 'test@gmail.com'})
+        response = client.post(
+            '/api/enrollments/1',
+            data=json_data,
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        assert 'success' in response.json.get('status')
+
+    def test_register_enrollment_wrong_event(self, client):
+        response = client.post(
+            '/api/enrollments/10',
+            content_type='application/json',
+        )
+        assert response.status_code == 400
+        assert 'error' in response.json.get('status')
+
+    def test_register_enrollment_no_seats(self, client):
+        json_data = json.dumps({'email': 'test@gmail.com'})
+        response = client.post(
+            '/api/enrollments/2',
+            data=json_data,
+            content_type='application/json',
+        )
+        another_response = client.post(
+            '/api/enrollments/2',
+            data=json.dumps({'email': 'another@gmail.com'}),
+            content_type='application/json',
+        )
+        assert another_response.status_code == 500
+        assert 'error' in another_response.json.get('status')
+
+    def test_register_enrollment_user_already_exist(self, client):
+        json_data = json.dumps({'email': 'test@gmail.com'})
+        response = client.post(
+            '/api/enrollments/1',
+            data=json_data,
+            content_type='application/json',
+        )
+        another_response = client.post(
+            '/api/enrollments/1',
+            data=json.dumps({'email': 'test@gmail.com'}),
+            content_type='application/json',
+        )
+        assert another_response.status_code == 500
+        assert another_response.json.get('status') == 'error, user already enrrolled'
