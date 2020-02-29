@@ -239,3 +239,13 @@ class TestApi:
         )
         assert response.status_code == 201
         assert 'email' in response.json
+
+    def test_profile(self, client):
+        response = client.get('/api/profile/1')
+        assert response.status_code == 200
+        assert 'email' in response.json
+
+    def test_profile_not_exist_id(self, client):
+        response = client.get('/api/profile/100')
+        assert response.status_code == 400
+        assert response.json.get('status') == 'error, participant does not exist'
