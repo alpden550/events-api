@@ -5,7 +5,7 @@ from flask import Flask
 
 from events_api.admin import EventView, ParticipantView, UserView, EnrollmentView, LocationView
 from events_api.blueprints.api import api_bp
-from events_api.extensions import admin, db, csrf, login
+from events_api.extensions import admin, db, csrf, login, migrate
 from events_api.models import Event, Participant, User, Enrollment, Location
 from events_api.settings import config
 
@@ -30,6 +30,7 @@ def register_extensions(app):
     admin.init_app(app)
     csrf.init_app(app)
     login.init_app(app)
+    migrate.init_app(app, db)
 
 
 def register_admin():

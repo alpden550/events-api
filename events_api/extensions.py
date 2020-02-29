@@ -1,5 +1,6 @@
 from flask_admin import Admin
 from flask_login import LoginManager
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
 
@@ -10,6 +11,7 @@ login = LoginManager()
 admin = Admin(index_view=AdminView(), name='EVENTS CRM')
 csrf = CSRFProtect()
 login = LoginManager()
+migrate = Migrate()
 
 login.login_view = 'admin.login'
 login.login_message = 'Авторизуйтесь для доступа к CRM'

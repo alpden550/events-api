@@ -1,10 +1,9 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import joinedload
 
-from events_api.extensions import csrf
+from events_api.extensions import csrf, db
 from events_api.models import Enrollment, Event, Location, Participant
 from events_api.schema_models import EventSchema, LocationSchema
-from events_api.extensions import db
 
 api_bp = Blueprint('api', __name__)
 csrf.exempt(api_bp)
