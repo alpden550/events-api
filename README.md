@@ -43,12 +43,40 @@ flask run
 
 ## How to use API
 
-`GET /api/locations/` get all locations
+* `GET /api/locations/` get all locations
 
-`GET /api/events/` get all events
+* `GET /api/events/` get all events
 
-`GET /api/events?eventtype=hackaton` filter events by event type, use `event_type` from model
+* `GET /api/events?eventtype=hackaton` filter events by event type, use `event_type` from model
 
-`GET /api/events?location=москва` filter events by location
+* `GET /api/events?location=москва` filter events by location
 
-`POST `
+* `POST /api/enrollments/id=<eventid>` create enrollment for user, user pass in the body via json `{
+   "email":"alpden@me.com"
+}`
+
+* `DELETE /api/enrollments/id=<eventid>` delete enrollment for user, user pass in the body via json `{
+   "email":"alpden@me.com"
+}`
+
+* `POST /api/register` register user as participant.
+
+  It needs required fields into passed json:
+
+  `{
+     "email":"test@gmail.com",
+     "name": "Namу Surname",
+     "password": "qwerty",
+     "location": "Moscow",
+     "about": "Some info about particiant.."
+  }`
+
+* `POST /api/auth/` authorize participant
+  It needs required fields into passed json:
+
+  `{
+     "email":"test@gmail.com",
+     "password": "qwerty",
+  }`
+
+* `GET api/profile/id=<profileid>` get particpant info.
