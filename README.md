@@ -53,11 +53,11 @@ flask run
 
 * `POST /api/enrollments/id=<eventid>` create enrollment for user, user pass in the body via json `{
    "email":"alpden@me.com"
-}`
+   }`
 
 * `DELETE /api/enrollments/id=<eventid>` delete enrollment for user, user pass in the body via json `{
    "email":"alpden@me.com"
-}`
+   }`
 
 * `POST /api/register` register user as participant.
 
@@ -68,7 +68,7 @@ flask run
      "name": "Namу Surname",
      "password": "qwerty",
      "location": "Moscow",
-     "about": "Some info about particiant.."
+     "about": "Some info about participant.."
   }`
 
 * `POST /api/auth/` authorize participant
@@ -79,4 +79,4 @@ flask run
      "password": "qwerty",
   }`
 
-* `GET api/profile/id=<profileid>` get particpant info.
+* `GET api/profile/id=<profileid>` get participant info.
