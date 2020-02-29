@@ -38,8 +38,10 @@ def get_events():
 
 
 @api_bp.route('/enrollments/<int:eventid>', methods=['POST'])
-def get_enrollment(eventid):
+def register_enrollment(eventid):
     event = Event.query.get(eventid)
+    if event is None:
+        return jsonify({'status': 'error, event does not found'}), 400
     if len(event.enrollments) > event.seats:
         return jsonify({'status': 'error, not seats'}), 500
 
@@ -60,11 +62,22 @@ def get_enrollment(eventid):
     )
 
 
-@api_bp.route('/enrollments/<int:enrollment_id>', methods=['DELETE'])
-def delete_enrollment(enrollment_id):
-    enrollment = Enrollment.query.get(enrollment_id)
-    if enrollment is None:
-        return jsonify({'status': 'error, enrollment does not exist'}), 400
+@api_bp.route('/enrollments/<int:event_id>', methods=['DELETE'])
+def delete_enrollment(event_id):
+    participant_email = request.json.get('email')
+    event = Event.query.get(event_id)
+    participant = Participant.query.filter_by(email=participant_email).first()
+    enrollment = Enrollment.query.join(Enrollment.participant).filter_by(email=participant_email).first()  # noqa:E501
+
+    if not participant_email:
+        return jsonify({'status': 'error, participant does not exist'}), 400
+    if event is None:
+        return jsonify({'status': 'error, event does not exist'}), 400
+    if participant is None or enrollment is None:
+        return jsonify({'status': 'error, participant or enrollment does not exist'}), 400
+
+    event.participants.remove(participant)
+    db.session.commit()
     enrollment.delete()
     return jsonify({'delete': 'success'}), 201
 
