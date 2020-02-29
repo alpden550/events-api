@@ -115,7 +115,7 @@ def authorize():
     participant_schema = schema.dump(participant)
 
     if not all(participant_fields):
-        return jsonify({'status': 'error, not all required fields are'}), 400
+        return jsonify({'status': 'error, not all required fields are'}), 500
     if participant is None:
         return jsonify({'status': 'error, participant does not exist'}), 400
     if not participant.validate_password(participant_json.get('password')):

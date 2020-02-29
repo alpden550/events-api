@@ -52,11 +52,11 @@ flask run
 * `GET /api/events?location=москва` filter events by location
 
 * `POST /api/enrollments/id=<eventid>` create enrollment for user, user pass in the body via json `{
-   "email":"alpden@me.com"
+   "email":"test@me.com"
    }`
 
 * `DELETE /api/enrollments/id=<eventid>` delete enrollment for user, user pass in the body via json `{
-   "email":"alpden@me.com"
+   "email":"test@me.com"
    }`
 
 * `POST /api/register` register user as participant.

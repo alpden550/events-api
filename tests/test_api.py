@@ -203,3 +203,39 @@ class TestApi:
         )
         assert response.status_code == 500
         assert response.json.get('status') == 'error, participant already exist'
+
+    def test_auth_without_required_fields(self, client):
+        response = client.post(
+            '/api/auth/',
+            data=json.dumps({'password': '', 'email': ''}),
+            content_type='application/json',
+        )
+        assert response.status_code == 500
+        assert response.json.get('status') == 'error, not all required fields are'
+
+    def test_auth_with_wrong_email(self, client):
+        response = client.post(
+            '/api/auth/',
+            data=json.dumps({'password': 'qwerty', 'email': 'test1@gmail.com'}),
+            content_type='application/json',
+        )
+        assert response.status_code == 400
+        assert response.json.get('status') == 'error, participant does not exist'
+
+    def test_auth_not_valid_password(self, client):
+        response = client.post(
+            '/api/auth/',
+            data=json.dumps({'password': 'another_qwerty', 'email': 'test@gmail.com'}),
+            content_type='application/json',
+        )
+        assert response.status_code == 400
+        assert response.json.get('status') == 'error, participant password not right'
+
+    def test_auth_success(self, client):
+        response = client.post(
+            '/api/auth/',
+            data=json.dumps({'password': 'qwerty', 'email': 'test@gmail.com'}),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        assert 'email' in response.json
