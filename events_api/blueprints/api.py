@@ -107,7 +107,7 @@ def authorize():
         return jsonify({'status': 'error, participant does not exist'}), 400
     if not participant.validate_password(participant_json.get('password')):
         return jsonify({'status': 'error, participant password not right'}), 400
-    return jsonify(participant_schema)
+    return jsonify(participant_schema), 201, {'Location': f'/participant/{participant.id}'}
 
 
 @api_bp.route('/profile/<int:profileid>', methods=['GET'])
