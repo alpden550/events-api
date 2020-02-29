@@ -94,6 +94,7 @@ class ParticipantView(Forbidden, ModelView):
         'events': 'События',
         'enrollments': 'Регистрации',
     }
+    column_editable_list = ('about', 'location', 'name')
 
 
 class EnrollmentView(Forbidden, ModelView):

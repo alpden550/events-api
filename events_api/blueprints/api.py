@@ -1,9 +1,8 @@
 from flask import Blueprint, jsonify, request
-from sqlalchemy.orm import joinedload
 
 from events_api.extensions import csrf, db
 from events_api.models import Enrollment, Event, Location, Participant
-from events_api.schema_models import EventSchema, LocationSchema
+from events_api.schema_models import EventSchema, LocationSchema, ParticipantSchema
 
 api_bp = Blueprint('api', __name__)
 csrf.exempt(api_bp)
@@ -91,9 +90,24 @@ def register():
     return jsonify(participant_json), 201, {'Location': f'/participant/{new_participant.id}'}
 
 
-@api_bp.route('/auth', methods=['POST'])
+@api_bp.route('/auth/', methods=['POST'])
 def authorize():
-    return jsonify({'status': 'success', 'key': 111111111})
+    participant_json = request.json
+    participant_fields = (
+        participant_json.get('email'),
+        participant_json.get('password'),
+    )
+    participant = Participant.query.filter_by(email=participant_json.get('email')).first()
+    schema = ParticipantSchema()
+    participant_schema = schema.dump(participant)
+
+    if not all(participant_fields):
+        return jsonify({'status': 'error, not all required fields are'}), 400
+    if participant is None:
+        return jsonify({'status': 'error, participant does not exist'}), 400
+    if not participant.validate_password(participant_json.get('password')):
+        return jsonify({'status': 'error, participant password not right'}), 400
+    return jsonify(participant_schema)
 
 
 @api_bp.route('/profile/<int:profileid>', methods=['GET'])
