@@ -72,7 +72,23 @@ def delete_enrollment(enrollment_id):
 
 @api_bp.route('/register/', methods=['POST'])
 def register():
-    return jsonify({'status': 'ok', 'id': 1})
+    participant_json = request.json
+    participant_fields = (
+        participant_json.get('name'),
+        participant_json.get('email'),
+        participant_json.get('password'),
+        participant_json.get('location'),
+        participant_json.get('about'),
+    )
+    participant = Participant.query.filter_by(email=participant_json.get('email')).first()
+
+    if participant is not None:
+        return jsonify({'status': 'error, participant already exist'}), 500
+    if not all(participant_fields):
+        return jsonify({'status': 'error, not all required fields are'}), 500
+
+    new_participant = Participant.create(**participant_json)
+    return jsonify(participant_json), 201, {'Location': f'/participant/{new_participant.id}'}
 
 
 @api_bp.route('/auth', methods=['POST'])
