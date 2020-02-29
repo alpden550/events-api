@@ -70,7 +70,7 @@ def delete_enrollment(event_id):
     enrollment = Enrollment.query.join(Enrollment.participant).filter_by(email=participant_email).first()  # noqa:E501
 
     if not participant_email:
-        return jsonify({'status': 'error, participant does not exist'}), 400
+        return jsonify({'status': 'error, participant email is'}), 400
     if event is None:
         return jsonify({'status': 'error, event does not exist'}), 400
     if participant is None or enrollment is None:

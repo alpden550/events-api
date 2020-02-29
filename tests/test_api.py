@@ -116,3 +116,90 @@ class TestApi:
         )
         assert another_response.status_code == 500
         assert another_response.json.get('status') == 'error, user already enrrolled'
+
+    def test_delete_enrollment_success(self, client):
+        first_response = client.post(
+            '/api/enrollments/1',
+            data=json.dumps({'email': 'test@gmail.com'}),
+            content_type='application/json',
+        )
+        response = client.delete(
+            '/api/enrollments/1',
+            data=json.dumps({'email': 'test@gmail.com'}),
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        assert 'success' in response.json.get('delete')
+
+    def test_delete_wrong_enrollment(self, client):
+        response = client.delete(
+            '/api/enrollments/100',
+            data=json.dumps({'email': 'test@gmail.com'}),
+            content_type='application/json',
+        )
+        assert response.status_code == 400
+        assert 'error' in response.json.get('status')
+
+    def test_delete_enrollment_without_email(self, client):
+        response = client.delete(
+            '/api/enrollments/1',
+            data=json.dumps({'email': ''}),
+            content_type='application/json',
+        )
+        assert response.status_code == 400
+        assert 'error' in response.json.get('status')
+
+    def test_delete_enrollment_wrong_email(self, client):
+        first_response = client.post(
+            '/api/enrollments/1',
+            data=json.dumps({'email': 'test@gmail.com'}),
+            content_type='application/json',
+        )
+        response = client.delete(
+            '/api/enrollments/1',
+            data=json.dumps({'email': 'another_test@gmail.com'}),
+            content_type='application/json',
+        )
+        assert response.status_code == 400
+        assert 'error' in response.json.get('status')
+
+    def test_register_without_required_fields(self, client):
+        response = client.post(
+            '/api/register/',
+            data=json.dumps({'name': '', 'email': '', 'password': '', 'location': '', 'about': ''}),
+            content_type='application/json',
+        )
+        assert response.status_code == 500
+        assert response.json.get('status') == 'error, not all required fields are'
+
+    def test_register_success(self, client):
+        user = json.dumps({
+            'name': 'Name',
+            'email': 'email@gmail.com',
+            'password': 'password',
+            'location': 'Moscow',
+            'about': 'About',
+        })
+        response = client.post(
+            '/api/register/',
+            data=user,
+            content_type='application/json',
+        )
+        assert response.status_code == 201
+        assert 'email' in response.json
+
+    def test_register_user_already_exist(self, client):
+        user = json.dumps({
+            'name': 'Name',
+            'email': 'test@gmail.com',
+            'password': 'password',
+            'location': 'Moscow',
+            'about': 'About',
+        })
+        response = client.post(
+            '/api/register/',
+            data=user,
+            content_type='application/json',
+        )
+        assert response.status_code == 500
+        assert response.json.get('status') == 'error, participant already exist'
