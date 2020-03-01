@@ -2,9 +2,10 @@ import json
 
 import pytest
 from flask import request
+from flask_login import current_user
 
 from events_api.extensions import db
-from events_api.models import Event, Location, Participant, Enrollment
+from events_api.models import Enrollment, Event, Location, Participant, User
 from tests.conftest import app
 
 
@@ -26,11 +27,15 @@ class TestApi:
             Event.create(title='Django', location=locations[1], event_type='GAME', seats=1)
             Participant.create(name='Name', email='test@gmail.com', password='qwerty')
             Participant.create(name='Another Name', email='another@gmail.com', password='qwerty')
+            User.create(username='admin', email='admin@gmail.com', password='password')
 
     @classmethod
     def teardown_class(cls):
         with app.app_context():
-            db.drop_all(app=app)
+            db.session.query(Location).delete()
+            db.session.query(Event).delete()
+            db.session.query(Participant).delete()
+            db.session.query(User).delete()
             db.session.commit()
 
     def test_api_page(self, client):
@@ -249,3 +254,79 @@ class TestApi:
         response = client.get('/api/profile/100')
         assert response.status_code == 400
         assert response.json.get('status') == 'error, participant does not exist'
+
+    def test_update_model_entry(self, client):
+        with app.app_context():
+            event = Event.query.first()
+            event.update(title='Django')
+            assert event.title == 'Django'
+
+    def test_save_entry_if_exist(self, client):
+        with app.app_context():
+            event = Event(title='PHP', id=1)
+            event.save()
+            assert not Event.query.filter_by(title='PHP').all()
+
+
+class TestAdmin:
+
+    @classmethod
+    def setup_class(cls):
+        with app.app_context():
+            User.create(username='admin', email='admin@gmail.com', password='password')
+
+    @classmethod
+    def teardown_class(cls):
+        pass
+
+    def test_admin_page_not_loginned(self, client):
+        response = client.get('/admin/')
+        assert response.status_code == 302
+        assert response.location == 'http://localhost/admin/login?next=%2Fadmin%2F'
+
+    def test_admin_page_loginned(self, client):
+        user = {'email': 'admin@gmail.com', 'password': 'password'}
+        client.post('/admin/login', data=user, follow_redirects=True)
+        response = client.get('/admin')
+        assert response.status_code == 308
+        assert response.location == 'http://localhost/admin/'
+
+    def test_admin_can_logout(self, client):
+        response = client.get('/admin/logout')
+        assert response.status_code == 302
+        assert response.location == 'http://localhost/admin/'
+
+    def test_login_page_user_already_loginned(self, client):
+        user = {'email': 'admin@gmail.com', 'password': 'password'}
+        client.post('/admin/login', data=user, follow_redirects=True)
+        response = client.get('/admin/login')
+        assert current_user.is_authenticated
+        assert response.status_code == 302
+        assert response.location == 'http://localhost/admin/'
+
+    def test_login_with_wrong_email(self, client):
+        user = {'email': 'test@test.com', 'password': 'password'}
+        response = client.post('/admin/login', data=user, follow_redirects=True)
+        assert response.status_code == 200
+        assert 'Authorisation' in str(response.data)
+        assert 'form method="POST" action="/admin/login"' in str(response.data)
+
+    def test_login_with_wrong_password(self, client):
+        user = {'email': 'admin@gmail.com', 'password': 'qwerty'}
+        response = client.post('/admin/login', data=user, follow_redirects=True)
+        assert response.status_code == 200
+        assert 'Authorisation' in str(response.data)
+        assert 'form method="POST" action="/admin/login"' in str(response.data)
+
+    def test_admin_with_wrong_account(self, client):
+        user = {'email': 'admin@gmail.com', 'password': 'qwerty'}
+        client.post('/admin/login/event/', data=user, follow_redirects=True)
+        response = client.get('/admin/')
+        assert response.status_code == 302
+        assert response.location == 'http://localhost/admin/login?next=%2Fadmin%2F'
+
+    def test_login_page(self, client):
+        response = client.get('/admin/login')
+        assert response.status_code == 200
+        assert 'Authorisation' in str(response.data)
+        assert 'form method="POST" action="/admin/login"' in str(response.data)

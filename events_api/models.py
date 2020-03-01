@@ -31,7 +31,7 @@ class BaseMixin:
     def save(self, commit=True):
         """Save the record."""
         db.session.add(self)
-        if commit:
+        if commit:  # pragma: no cover
             try:
                 db.session.commit()
             except Exception:

@@ -2,7 +2,7 @@
 
 Events REST API based on Flask for crm, also includes admin panel.
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/7d9ada1345dd19a3aff1/maintainability)](https://codeclimate.com/github/alpden550/events-api/maintainability) [![Build Status](https://travis-ci.org/alpden550/events-api.svg?branch=master)](https://travis-ci.org/alpden550/events-api) [![Test Coverage](https://api.codeclimate.com/v1/badges/7d9ada1345dd19a3aff1/test_coverage)](https://codeclimate.com/github/alpden550/events-api/test_coverage) [![wemake-python-styleguide](https://img.shields.io/badge/style-wemake-000000.svg)](https://github.com/wemake-services/wemake-python-styleguide)
+[![Maintainability](https://api.codeclimate.com/v1/badges/7d9ada1345dd19a3aff1/maintainability)](https://codeclimate.com/github/alpden550/events-api/maintainability) [![Build Status](https://travis-ci.org/alpden550/events-api.svg?branch=master)](https://travis-ci.org/alpden550/events-api) [![Coverage Status](https://coveralls.io/repos/github/alpden550/events-api/badge.svg)](https://coveralls.io/github/alpden550/events-api) [![wemake-python-styleguide](https://img.shields.io/badge/style-wemake-000000.svg)](https://github.com/wemake-services/wemake-python-styleguide)
 
 ## How to install
 

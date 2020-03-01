@@ -10,7 +10,7 @@ class Forbidden(object):
     def is_accessible(self):
         return current_user.is_authenticated
 
-    def inaccessible_callback(self, name, **kwargs):
+    def inaccessible_callback(self, name, **kwargs):  # pragma: no cover
         flash('Нужен аккаунт администратора!')
         return redirect(url_for('admin.login', next=request.url))
 
